@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>App PWA Saya</title>
+    <title>TEST APP LANSIA</title>
     <!-- Menghubungkan ke file manifest -->
     <link rel="manifest" href="./manifest.json">
     <!-- Warna tema untuk status bar di HP -->
@@ -17,8 +17,22 @@
     <h1>Halo PWA!</h1>
     <p>Ini adalah website yang bisa di-install menjadi aplikasi.</p>
     
+    <!-- ========================================== -->
+    <!-- ELEMEN POP-UP BANNER KUSTOM                -->
+    <!-- ========================================== -->
+    <div id="install-banner" style="display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #ffffff; color: #333333; padding: 15px 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-radius: 8px; z-index: 9999; width: 90%; max-width: 400px; text-align: left;">
+        <p style="margin: 0 0 10px 0; font-weight: bold;">Pasang Aplikasi NE SU !!!!</p>
+        <p style="margin: 0 0 15px 0; font-size: 14px;">Akses aplikasi lebih cepat langsung dari layar utama HP kamu gok.</p>
+        <div style="text-align: right;">
+            <button id="btn-batal" style="background: none; border: none; color: #666; margin-right: 15px; cursor: pointer;">halah nyocot</button>
+            <button id="btn-install" style="background: #4285F4; border: none; color: white; padding: 8px 15px; border-radius: 4px; font-weight: bold; cursor: pointer;">Install</button>
+        </div>
+    </div>
+
     <script>
-        // Mendaftarkan Service Worker
+        // ==========================================
+        // 1. Mendaftarkan Service Worker
+        // ==========================================
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js')
@@ -26,6 +40,46 @@
                     .catch(err => console.error('Service Worker gagal:', err));
             });
         }
+
+        // ==========================================
+        // 2. Logika Pop-up Install PWA
+        // ==========================================
+        let deferredPrompt;
+        const installBanner = document.getElementById('install-banner');
+        const btnInstall = document.getElementById('btn-install');
+        const btnBatal = document.getElementById('btn-batal');
+
+        // Menangkap event sebelum pop-up bawaan muncul
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Mencegah pop-up default dari browser
+            e.preventDefault();
+            // Menyimpan event untuk dieksekusi saat tombol Install diklik
+            deferredPrompt = e;
+            // Memunculkan banner buatan kita
+            installBanner.style.display = 'block';
+        });
+
+        // Jika tombol "Install" diklik
+        btnInstall.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                // Panggil prompt instalasi bawaan Android
+                deferredPrompt.prompt();
+                // Tunggu respons dari pengguna (apakah memilih Install atau Batal)
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(`Pilihan user: ${outcome}`);
+                
+                // Sembunyikan banner kita setelah ada respons
+                installBanner.style.display = 'none';
+                // Kosongkan variabel karena prompt hanya bisa dipanggil satu kali
+                deferredPrompt = null;
+            }
+        });
+
+        // Jika tombol "Nanti Saja" diklik
+        btnBatal.addEventListener('click', () => {
+            // Sembunyikan banner
+            installBanner.style.display = 'none';
+        });
     </script>
 </body>
 </html>
