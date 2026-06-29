@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App PWA Saya</title>
+    <!-- Menghubungkan ke file manifest -->
+    <link rel="manifest" href="./manifest.json">
+    <!-- Warna tema untuk status bar di HP -->
+    <meta name="theme-color" content="#4285F4">
+    <style>
+        body { font-family: sans-serif; text-align: center; padding-top: 50px; }
+        .btn { padding: 10px 20px; background: #4285F4; color: white; border-radius: 5px; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <h1>Halo PWA!</h1>
+    <p>Ini adalah website yang bisa di-install menjadi aplikasi.</p>
+    
+    <script>
+        // Mendaftarkan Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('Service Worker sukses didaftarkan!', reg.scope))
+                    .catch(err => console.error('Service Worker gagal:', err));
+            });
+        }
+    </script>
+</body>
+</html>
